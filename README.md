@@ -7,15 +7,15 @@
 In software development environment, the need for efficient artifact management is paramount. As a DevOps Engineer, I recognized the necessity of streamlining the deployment process and ensuring a reliable artifact repository for Java applications. To achieve this, I recently embarked on a journey to set up Artifactory on cloud server. In this blog, I will share the steps I took to accomplish this, detailing the installation and configuration processes along the way.
 
 ## Purpose
-Artifactory management serve as vital components in a DevOps pipeline. They provide a centralized location to store and manage artifacts produced during the software development lifecycle.It is known for its rich feature set, including support for various package types, advanced search capabilities, and user management features. 
+Artifactory management serve as vital components in a DevOps pipeline. They provide a centralized location to store and manage artifacts produced during the software development lifecycle. It is known for its rich feature set, including support for various package types, advanced search capabilities, and user management features. 
 
-## The Situation: Why I harnessed Artifactory for Efficient Dependency and Artifact Management
+## The Situation: 
 As a DevOps Engineer, I once faced challenges with a team concerning dependency management and artifact storage, ultimately leading to delays in deployment when locally stored packages were accidentally deleted. The absence of a centralized repository made it difficult to track versions and manage dependencies effectively. To overcome these challenges, I decided to deploy Nexus to manage the artifacts while maven was already used in the environment to build the Java applications.
 
 
-## Let's start simple. First, we'll put our Java app on Apache Tomcat, which is a web server. This helps us check if our app works right on a basic website. If it works here, we know it's good to go. 
+### Let's start simple. First, we'll put our Java app on Apache Tomcat, which is a web server. This helps us check if our app works right on a basic website. If it works here, we know it's good to go. 
 
-#### 1. Pre-requisites: Ubuntu Server or any other Linux server
+#### Pre-requisites: Ubuntu Server or any other Linux server
 
 ### 1. Installing Tomcat
 
@@ -24,7 +24,7 @@ As a DevOps Engineer, I once faced challenges with a team concerning dependency 
 sudo useradd -m -d /opt/tomcat -U -s /bin/false tomcat
 ```
 
-**Update the Package Manager Cache**
+**Update the Linux Package Manager Cache**
 ```bash
 sudo apt update
 ```
@@ -51,23 +51,26 @@ sudo chown -R tomcat:tomcat /opt/tomcat/
 sudo chmod -R u+x /opt/tomcat/bin
 ```
 
-**Configure Users for Tomcat**
-Edit the `tomcat-users.xml` file to define user roles and access:
+**Configure Users for Tomcat**:
+- Edit the `tomcat-users.xml` file to define user roles and access:
 ```bash
 sudo nano /opt/tomcat/conf/tomcat-users.xml
 ```
 Add the following lines before the closing `</tomcat-users>` tag:
 ```xml
 <role rolename="manager-gui" />
-<user username="manager" password="xxxxxxxd" roles="manager-gui" />
+<user username="manager" password="xxxxxxx" roles="manager-gui" />
 
 <role rolename="admin-gui" />
-<user username="admin" password="xxxxxxxd" roles="manager-gui,admin-gui" />
+<user username="admin" password="xxxxxxx" roles="manager-gui,admin-gui" />
 ```
 **Replace with your chosen password**
 
-**Allow Remote Access**
-To enable access to the Manager and Host Manager pages, edit the context.xml files:
+<img width="472" alt="image" src="https://github.com/user-attachments/assets/5d7dca0c-f9b1-4f5f-8b09-ced17a1331c8">
+
+
+**Allow Remote Access**:
+- To enable access to the Manager and Host Manager pages, edit the context.xml files:
 ```bash
 # Edit Manager context file
 sudo nano /opt/tomcat/webapps/manager/META-INF/context.xml
@@ -79,8 +82,8 @@ sudo nano /opt/tomcat/webapps/host-manager/META-INF/context.xml
 ```
 <img width="571" alt="image" src="https://github.com/user-attachments/assets/efec82b6-3dfe-4f9f-920a-40eecc230054">
 
-**Setup Systemd for Tomcat**
-Find the Java location:
+**Setup Systemd for Tomcat**:
+- Find the Java location:
 ```bash
 sudo update-java-alternatives -l
 ```
@@ -139,9 +142,10 @@ WantedBy=multi-user.target
 sudo systemctl daemon-reload
 sudo systemctl start tomcat
 sudo systemctl enable tomcat
+```
+
 <img width="559" alt="image" src="https://github.com/user-attachments/assets/db62b67c-edf8-4445-b562-4fe15a95c29a">
 
-```
 Allow access to Tomcat on port 8080:
 ```bash
 sudo ufw allow 8080
@@ -177,6 +181,7 @@ Change the `<finalName>` tag in your `pom.xml` to a name of your choice and save
 <finalName>My_Maven_Webapp</finalName>
 ```
 <img width="454" alt="image" src="https://github.com/user-attachments/assets/964341cf-f658-4e10-b2c9-62be1421bbe5">
+
 
 **Lets modify index.jsp file to what we would like to see on our browser when launced**
 ```
@@ -232,8 +237,8 @@ sudo chown -R nexus:nexus /opt/nexus
 sudo chown -R nexus:nexus /opt/sonatype-work
 ```
 
-**Configure Nexus to Run as a Service**
-Edit the `nexus.rc` file:
+**Configure Nexus to Run as a Service**:
+- Edit the `nexus.rc` file:
 ```bash
 sudo nano /opt/nexus/bin/nexus.rc
 # Add the following line
@@ -243,7 +248,10 @@ run_as_user="nexus"
 **To modify config options, open the /opt/nexus/bin/nexus.vmoptions file, you can modify the config path as shown below**
 ```
 sudo nano /opt/nexus/bin/nexus.vmoptions
-In the below settings, the directory is changed from ../sonatype-work to /opt/sonatype-work
+```
+In the below settings, the directory is changed from `../sonatype-work` to `/opt/sonatype-work`
+
+```
 -Xms1024m
 -Xmx1024m
 -XX:MaxDirectMemorySize=1024m
@@ -313,40 +321,42 @@ You will be prompted to change the password upon first login.
 1. In the Nexus web interface, click on **wheel-like icon**.
 2. Click on `repository` and **Create repository**.
 3. Select **maven2 (hosted)** and click **Next**.
+   - 
+     <img width="575" alt="image" src="https://github.com/user-attachments/assets/cd16b958-8de4-43d3-bb26-fbe342c9b5b6">
+     
 4. Configure the repository settings (like name, version policy, etc.), and click **Create repository**.
-
-**Create a Maven Proxy Repository**
-1. Click on **Create repository**.
-   <img width="770" alt="image" src="https://github.com/user-attachments/assets/a6539e76-0525-4fc3-afc9-cdd15f641d52">
-
-3. Select **maven2 (hosted)** and click **Next**.
-   <img width="575" alt="image" src="https://github.com/user-attachments/assets/cd16b958-8de4-43d3-bb26-fbe342c9b5b6">
+     <img width="770" alt="image" src="https://github.com/user-attachments/assets/a6539e76-0525-4fc3-afc9-cdd15f641d52">
 
 5. Configure the repository settings,  and click **Create repository**.
    <img width="548" alt="image" src="https://github.com/user-attachments/assets/13207581-4be9-4ad7-aafd-de723c1340a1">
 
-### 5. Test a manual upload to artifactory.
+### Test a manual upload to artifactory.
 
 First get the url of your repository and copy it out for the next coomand below
 
 <img width="494" alt="image" src="https://github.com/user-attachments/assets/42dea90b-2fab-4cb0-9fe5-63fd8860c5ad">
 
+
 ```
 cd /home/ubuntu/maven-java-builds/target
 curl -v -u admin:pass --upload-file /root/maven-java-builds/target/My_Maven_Webapp.war http://<server-ip-address>:8081/repository/My_Maven_Webapp/  
 ```
+
 <img width="610" alt="image" src="https://github.com/user-attachments/assets/caf6f7b4-f964-42cf-aace-b4b71dcc80e6">
 
-Check back at your repository in the `browse section` to find you artifacts uploaded.
 
-Likewise, artifacts can also be donwloaded manually.
+- Check back at your repository in the `browse section` to find you artifacts uploaded.
+
+- Likewise, artifacts can also be donwloaded manually.
 
 ```
 curl -X GET http://admin:pass@<server-ip-address>:8081/repository/My_Maven_Webapp/My_Maven_Webapp.war --output My_Maven_Webapp.war
 ```
-### Integratin Nexus with Maven Builds
+### Integrating Nexus with Maven Builds
 
-## Let's configure your Maven project to work with Nexus. Navigate to your project directory:
+## Let's configure your Maven project to work with Nexus. 
+
+- Navigate to your project directory:
 
 ```
 cd /home/ubuntu/maven-java-builds
@@ -385,7 +395,7 @@ Your `pom.xml` file is the heart of your Maven project. Here's a sample configur
 
   <!-- Build configuration -->
   <build>
-    <finalName>Seun_Web2</finalName>
+    <finalName>My_Maven_Webapp</finalName>
     <plugins>
       <!-- Compiler plugin -->
       <plugin>
@@ -416,7 +426,7 @@ Your `pom.xml` file is the heart of your Maven project. Here's a sample configur
     <repository>
       <id>nexus</id>
       <name>Seun_Web2</name>
-      <url>http://<Ip-address>:8081/repository/Seun_Web/</url> <!-- Your repository URL here -->
+      <url>http://<Ip-address>:8081/repository/My_Maven_Webapp/</url> <!-- Your repository URL here -->
     </repository>
   </distributionManagement>
 </project>
@@ -453,7 +463,7 @@ chown username:groupname ~/.m2/settings.xml
 
 ## Deploying Your Application
 
-To deploy your application to Nexus:
+To deploy your application to Nexus, run:
 
 ```
 mvn clean deploy
@@ -485,8 +495,8 @@ If you encounter a 401 Unauthorized error, ensure that:
 
 ## Java Compatibility
 
-Ensure you're using Java 17 or later. Set up your environment:
+Ensure you're using Java 17 or later to set up your environment:
 
 ## Conclusion
-With these detailed steps, you would have successfully accomplished three key objectives: setting up Tomcat, deploying a Java application, and integrating Nexus Repository into the workflow. This process not only streamlined the development process but will also enhance collaboration within a team. The ability to manage dependencies efficiently and deploy applications reliably will definitely increase one's confidence in delivering high-quality software on time. Furthermore, these manual builds can be integrated into CI/CD pipelines, offering potential for full automation. Overall, this implementation significantly improves development lifecycle, positioning a team for more efficient and effective project execution.
+With these detailed steps, you would have successfully accomplished three key objectives: setting up Tomcat, deploying a Java application, and integrating Nexus Repository into the workflow. This process not only streamlines the development process but will also enhance collaboration within a team. The ability to manage dependencies efficiently and deploy applications reliably will definitely increase one's confidence in delivering high-quality software on time. Furthermore, these manual builds can be integrated into CI/CD pipelines, for full automation. Overall, this implementation significantly improves development lifecycle, positioning a team for more efficient and effective project execution.
 
