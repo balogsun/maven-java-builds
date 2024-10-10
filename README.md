@@ -425,7 +425,7 @@ Your `pom.xml` file is the heart of your Maven project. Here's a sample configur
   <distributionManagement>
     <repository>
       <id>nexus</id>
-      <name>Seun_Web2</name>
+      <name>My_Maven_Webapp</name>
       <url>http://<Ip-address>:8081/repository/My_Maven_Webapp/</url> <!-- Your repository URL here -->
     </repository>
   </distributionManagement>
